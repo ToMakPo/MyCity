@@ -19,8 +19,44 @@ type ViewState = {
   startPanY: number;
 };
 
+// IndexedDB utility for NoSQL-style persistence
+function openUIStore(): Promise<IDBObjectStore> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mycity-ui', 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore('ui');
+    };
+    req.onsuccess = () => {
+      const tx = req.result.transaction('ui', 'readwrite');
+      resolve(tx.objectStore('ui'));
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+async function setUIStateIndexedDB(key: string, value: unknown) {
+  const store = await openUIStore();
+  store.put(value, key);
+  store.transaction.oncomplete = () => store.transaction.db.close();
+}
+async function getUIStateIndexedDB<T = unknown>(key: string): Promise<T | undefined> {
+  const store = await openUIStore();
+  return new Promise<T | undefined>((resolve, reject) => {
+    const req = store.get(key);
+    req.onsuccess = () => {
+      store.transaction.db.close();
+      resolve(req.result as T | undefined);
+    };
+    req.onerror = () => {
+      store.transaction.db.close();
+      reject(req.error);
+    };
+  });
+}
+
 function MainPage() {
+  // All hooks must be called unconditionally at the top level
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [view, setView] = useState<ViewState>({
     offsetX: 0,
     offsetY: 0,
@@ -30,10 +66,47 @@ function MainPage() {
     startPanY: 0,
   })
   const [unitIndex, setUnitIndex] = useState(0)
-  const [citySize, setCitySize] = useState({ x: 15, y: 15 }) // default 2 miles/km in each direction
+  const [citySize, setCitySize] = useState({ x: 15, y: 15 })
   const [minimapMaxSize, setMinimapMaxSize] = React.useState(180)
   const [isMinimapDragging, setIsMinimapDragging] = React.useState(false)
   const unit = UNITS[unitIndex]
+  const panIntervalRef = React.useRef<number | null>(null)
+  const zoomIntervalRef = React.useRef<number | null>(null)
+
+  // Load persisted state from IndexedDB on mount, then set loaded=true
+  React.useEffect(() => {
+    (async () => {
+      const [persistedView, persistedCitySize, persistedUnitIndex, persistedMinimapMaxSize] = await Promise.all([
+        getUIStateIndexedDB<ViewState>('view'),
+        getUIStateIndexedDB<{ x: number; y: number }>('citySize'),
+        getUIStateIndexedDB<number>('unitIndex'),
+        getUIStateIndexedDB<number>('minimapMaxSize'),
+      ]);
+      if (persistedView) setView(persistedView);
+      if (persistedCitySize) setCitySize(persistedCitySize);
+      if (typeof persistedUnitIndex === 'number') setUnitIndex(persistedUnitIndex);
+      if (typeof persistedMinimapMaxSize === 'number') setMinimapMaxSize(persistedMinimapMaxSize);
+      setLoaded(true);
+    })();
+  }, []);
+
+  // Persist view, citySize, unitIndex, minimapMaxSize to IndexedDB on change, but only after loaded
+  React.useEffect(() => {
+    if (!loaded) return;
+    setUIStateIndexedDB('view', view);
+  }, [view, loaded]);
+  React.useEffect(() => {
+    if (!loaded) return;
+    setUIStateIndexedDB('citySize', citySize);
+  }, [citySize, loaded]);
+  React.useEffect(() => {
+    if (!loaded) return;
+    setUIStateIndexedDB('unitIndex', unitIndex);
+  }, [unitIndex, loaded]);
+  React.useEffect(() => {
+    if (!loaded) return;
+    setUIStateIndexedDB('minimapMaxSize', minimapMaxSize);
+  }, [minimapMaxSize, loaded]);
 
   // Helper to get min/max zoom and offset bounds
   function getZoomBounds(
@@ -274,9 +347,6 @@ function MainPage() {
   }, [])
 
   // --- Continuous pan/zoom logic ---
-  const panIntervalRef = React.useRef<number | null>(null)
-  const zoomIntervalRef = React.useRef<number | null>(null)
-
   function startContinuousPan(direction: 'up' | 'down' | 'left' | 'right') {
     if (panIntervalRef.current) clearInterval(panIntervalRef.current)
     const panAmount = 80
@@ -377,85 +447,82 @@ function MainPage() {
     setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
   }
 
-  React.useEffect(() => {
-    return () => {
-      const panInterval = panIntervalRef.current
-      const zoomInterval = zoomIntervalRef.current
-      if (panInterval) clearInterval(panInterval)
-      if (zoomInterval) clearInterval(zoomInterval)
-    }
-  }, [])
-
+  // Only render after loaded, but always call all hooks
+  const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
   return (
-    <div id="MainPage">
-      <div id="ui-controls">
-        <SettingsMenu
-          citySizeInputProps={{
-            citySize,
-            setCitySize,
-            unit,
-            onUnitToggle: handleUnitToggle,
-          }}
-        />
-        <PanZoomControls
-          onZoomIn={() => doSingleZoom('in')}
-          onZoomOut={() => doSingleZoom('out')}
-          onZoomStart={startContinuousZoom}
-          onZoomStop={stopContinuousZoom}
-          zoomLabel={`Zoom: ${view.zoom.toFixed(2)}x`}
-          zoomSliderValue={(() => {
-            const bounds = getZoomBounds(citySize, unit, window.innerWidth, window.innerHeight)
-            const minZoom = bounds.minZoom
-            const maxZoom = bounds.maxZoom
-            const logMin = Math.log(minZoom)
-            const logMax = Math.log(maxZoom)
-            const logZoom = Math.log(view.zoom)
-            return (logZoom - logMin) / (logMax - logMin)
-          })()}
-          onZoomSliderChange={sliderValue => {
-            const bounds = getZoomBounds(citySize, unit, window.innerWidth, window.innerHeight)
-            const minZoom = bounds.minZoom
-            const maxZoom = bounds.maxZoom
-            const logMin = Math.log(minZoom)
-            const logMax = Math.log(maxZoom)
-            const logZoom = logMin + sliderValue * (logMax - logMin)
-            const newZoom = Math.exp(logZoom)
-            const canvas = canvasRef.current
-            if (!canvas) return
-            const viewportCenterX = canvas.width / 2
-            const viewportCenterY = canvas.height / 2
-            const worldCenterX = (viewportCenterX - view.offsetX) / view.zoom
-            const worldCenterY = (viewportCenterY - view.offsetY) / view.zoom
-            const newOffsetX = viewportCenterX - worldCenterX * newZoom
-            const newOffsetY = viewportCenterY - worldCenterY * newZoom
-            const clamped = clampOffset(newOffsetX, newOffsetY, newZoom, canvas.width, canvas.height, citySize, unit)
-            setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
-          }}
-          onPan={doSinglePan}
-          onPanStart={startContinuousPan}
-          onPanStop={stopContinuousPan}
-        />
-        <ScaleBar view={view} unit={unit} canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>} />
-        <Minimap
-          citySize={citySize}
-          unit={unit}
-          view={view}
-          setView={setView}
-          canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>}
-          minimapMaxSize={minimapMaxSize}
-          setMinimapMaxSize={setMinimapMaxSize}
-          isMinimapDragging={isMinimapDragging}
-          setIsMinimapDragging={setIsMinimapDragging}
-          clampOffset={clampOffset}
-        />
+    isLoading ? (
+      <div style={{width: '100vw', height: '100vh', background: '#e0e7ef'}} />
+    ) : (
+      <div id="MainPage">
+        <div id="ui-controls">
+          <SettingsMenu
+            citySizeInputProps={{
+              citySize,
+              setCitySize,
+              unit,
+              onUnitToggle: handleUnitToggle,
+            }}
+          />
+          <PanZoomControls
+            onZoomIn={() => doSingleZoom('in')}
+            onZoomOut={() => doSingleZoom('out')}
+            onZoomStart={startContinuousZoom}
+            onZoomStop={stopContinuousZoom}
+            zoomLabel={`Zoom: ${view.zoom.toFixed(2)}x`}
+            zoomSliderValue={(() => {
+              const bounds = getZoomBounds(citySize, unit, window.innerWidth, window.innerHeight)
+              const minZoom = bounds.minZoom
+              const maxZoom = bounds.maxZoom
+              const logMin = Math.log(minZoom)
+              const logMax = Math.log(maxZoom)
+              const logZoom = Math.log(view.zoom)
+              return (logZoom - logMin) / (logMax - logMin)
+            })()}
+            onZoomSliderChange={sliderValue => {
+              const bounds = getZoomBounds(citySize, unit, window.innerWidth, window.innerHeight)
+              const minZoom = bounds.minZoom
+              const maxZoom = bounds.maxZoom
+              const logMin = Math.log(minZoom)
+              const logMax = Math.log(maxZoom)
+              const logZoom = logMin + sliderValue * (logMax - logMin)
+              const newZoom = Math.exp(logZoom)
+              const canvas = canvasRef.current
+              if (!canvas) return
+              const viewportCenterX = canvas.width / 2
+              const viewportCenterY = canvas.height / 2
+              const worldCenterX = (viewportCenterX - view.offsetX) / view.zoom
+              const worldCenterY = (viewportCenterY - view.offsetY) / view.zoom
+              const newOffsetX = viewportCenterX - worldCenterX * newZoom
+              const newOffsetY = viewportCenterY - worldCenterY * newZoom
+              const clamped = clampOffset(newOffsetX, newOffsetY, newZoom, canvas.width, canvas.height, citySize, unit)
+              setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
+            }}
+            onPan={doSinglePan}
+            onPanStart={startContinuousPan}
+            onPanStop={stopContinuousPan}
+          />
+          <ScaleBar view={view} unit={unit} canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>} />
+          <Minimap
+            citySize={citySize}
+            unit={unit}
+            view={view}
+            setView={setView}
+            canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>}
+            minimapMaxSize={minimapMaxSize}
+            setMinimapMaxSize={setMinimapMaxSize}
+            isMinimapDragging={isMinimapDragging}
+            setIsMinimapDragging={setIsMinimapDragging}
+            clampOffset={clampOffset}
+          />
+        </div>
+        <canvas
+          id="city-canvas"
+          ref={canvasRef}
+          width={window.innerWidth}
+          height={window.innerHeight}
+        ></canvas>
       </div>
-      <canvas
-        id="city-canvas"
-        ref={canvasRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
-      ></canvas>
-    </div>
+    )
   )
 }
 
