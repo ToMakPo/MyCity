@@ -20,7 +20,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 					position: 'fixed',
 					top: 18,
 					right: 18,
-					zIndex: 200,
+					zIndex: 201,
 					width: 44,
 					height: 44,
 					border: 'none',
@@ -57,7 +57,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 					background: 'rgba(255,255,255,0.97)',
 					borderLeft: '2px solid #aaa',
 					boxShadow: open ? '-8px 0 24px rgba(0,0,0,0.10)' : 'none',
-					zIndex: 2001, // ensure above minimap and hamburger
+					zIndex: 200, // ensure above minimap and hamburger
 					transform: open ? 'translateX(0)' : 'translateX(110%)',
 					transition: 'transform 0.35s cubic-bezier(.7,0,.3,1)',
 					padding: open ? 24 : 0,
