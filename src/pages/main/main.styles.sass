@@ -1,0 +1,132 @@
+#MainPage
+	position: fixed
+	inset: 0
+	width: 100vw
+	height: 100vh
+	margin: 0
+	padding: 0
+	overflow: hidden
+	display: flex
+	justify-content: center
+	align-items: center
+	background: #e0e7ef
+
+	--button-bg: #444444
+	--button-hover-bg: #406f8a
+	--button-text-color: currentColor
+
+#city-canvas
+	width: 100vw
+	height: 100vh
+	display: block
+	border: 2px solid #333
+	background: #fff
+	box-shadow: 0 4px 24px rgba(0,0,0,0.1)
+	touch-action: none // Prevent browser pinch-zoom and pan on canvas
+
+#ui-controls
+	position: absolute
+	top: 16px
+	left: 16px
+	z-index: 10
+	display: flex
+	flex-direction: column
+	gap: 8px
+
+.ui-pan-buttons
+	display: block
+	position: relative
+
+	.donut-button
+		cursor: pointer
+		fill: var(--button-bg)
+	
+	.donut-arrow
+		fill: var(--button-text-color)
+
+#ui-controls button
+	padding: 6px 12px
+	font-size: 1.1em
+	border-radius: 6px
+	border: 1px solid #888
+	background: #444444
+	cursor: pointer
+	transition: background 0.2s
+	&:hover
+		background: #406f8a
+
+#scale-bar
+	position: absolute
+	bottom: 24px
+	left: 24px
+	z-index: 10
+	display: flex
+	align-items: center
+	gap: 12px
+	background: rgba(255,255,255,0.85)
+	border-radius: 8px
+	padding: 6px 14px
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08)
+
+.scale-bar-line
+	height: 6px
+	background: #333
+	border-radius: 3px
+	margin-right: 8px
+	min-width: 40px
+	max-width: 200px
+	display: inline-block
+
+.scale-bar-label
+	font-size: 1.1em
+	color: #222
+	margin-right: 10px
+
+.scale-bar-toggle
+	font-size: 0.95em
+	padding: 3px 10px
+	border-radius: 5px
+	border: 1px solid #888
+	background: #444444
+	cursor: pointer
+	transition: background 0.2s
+	&:hover
+		background: #406f8a
+
+#city-size-input
+	margin-bottom: 12px
+	label
+		font-size: 1em
+		color: #222
+		display: flex
+		align-items: center
+		gap: 8px
+		input[type="number"]
+			width: 60px
+			padding: 2px 6px
+			font-size: 1em
+			border-radius: 4px
+			border: 1px solid #aaa
+			background: #fafafa
+			color: #222
+		.city-size-x, .city-size-y
+			margin-left: 8px
+			margin-right: 4px
+
+#minimap-container
+	position: fixed
+	right: 0
+	bottom: 0
+	z-index: 100
+	margin: 0 !important
+	background: none
+	pointer-events: auto
+
+	#minimap
+		background: #fff
+		border-radius: 8px
+		box-shadow: 0 2px 8px rgba(0,0,0,0.12)
+		display: block
+
+	&.dragging, &.dragging *
+		cursor: none !important
