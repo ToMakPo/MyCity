@@ -1,0 +1,51 @@
+#settings-toggle
+	--btn-size: 45px
+	position: fixed
+	top: 16px
+	right: 16px
+	width: var(--btn-size)
+	height: var(--btn-size)
+	z-index: 201
+	border-radius: 50%
+	background-color: var(--button-bg)
+	box-shadow: 0 2px 8px rgba(0,0,0,0.12)
+	cursor: pointer
+	display: flex
+	align-items: center
+	justify-content: center
+	transition: background-color 0.2s ease
+
+	&:hover
+		background-color: var(--button-hover-bg)
+
+	svg
+		fill: var(--button-text-color)
+		stroke: var(--button-text-color)
+
+#settings-panel
+	position: fixed
+	top: 0
+	right: 0
+	width: 320px
+	height: 100vh
+	max-width: 100vw
+	background-color: #ffffff
+	border-left: 3px solid #777
+	z-index: 200
+	transition: 0.83s cubic-bezier(0.7, 0, 0.3, 1)
+	overflow-y: auto
+	display: flex
+	flex-direction: column
+	gap: 18px
+
+#settings-overlay
+	position: fixed
+	inset: 0
+	z-index: 199
+	background-color: rgba(0, 0, 0, 0.5)
+	cursor: pointer
+
+#units-toggle
+	display: flex
+	align-items: center
+	gap: 10px

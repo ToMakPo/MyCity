@@ -1,8 +1,22 @@
 // Minimap.tsx
-import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import type { ViewState, Unit } from '../../pages/main/types'
-import type { CitySizeInputProps } from './CitySizeInput';
+import type { CitySizeInputProps } from './city-size-input.component'
+import './minimap.styles.sass'
 
+/**
+ * Props for Minimap component.
+ * @property citySize - The city size (x/y dimensions).
+ * @property unit - The current unit system.
+ * @property view - The current map view state.
+ * @property setView - Callback to update view state.
+ * @property canvasRef - Ref to the main map canvas.
+ * @property minimapMaxSize - Max size (px) for minimap.
+ * @property setMinimapMaxSize - Callback to update minimap size.
+ * @property isMinimapDragging - Whether the minimap viewport is being dragged.
+ * @property setIsMinimapDragging - Callback to set dragging state.
+ * @property clampOffset - Utility to clamp viewport offset to city bounds.
+ */
 interface MinimapProps {
 	citySize: CitySizeInputProps['citySize'];
 	unit: Unit;
@@ -24,6 +38,11 @@ interface MinimapProps {
 	) => { offsetX: number; offsetY: number };
 }
 
+/**
+ * Renders a draggable, resizable minimap for city overview and viewport navigation.
+ * - Shows city bounds and current viewport rectangle.
+ * - Allows dragging the viewport and resizing the minimap.
+ */
 const Minimap: React.FC<MinimapProps> = ({
 	citySize,
 	unit,
@@ -38,6 +57,7 @@ const Minimap: React.FC<MinimapProps> = ({
 }) => {
 	const minimapRef = useRef<SVGSVGElement>(null);
 	const border = 8;
+	// Calculate minimap/city aspect ratio and drawing area
 	const citySizeMeters = useMemo(() => ({ x: citySize.x * unit.scale, y: citySize.y * unit.scale }), [citySize, unit]);
 	const aspect = citySizeMeters.x / citySizeMeters.y;
 	let minimapWidth: number, minimapHeight: number, cityDrawWidth: number, cityDrawHeight: number, offsetX: number, offsetY: number, scale: number;
@@ -58,6 +78,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		offsetY = border;
 		offsetX = border;
 	}
+	// Calculate current viewport rectangle in minimap coordinates
 	const viewRect = useMemo(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
@@ -69,6 +90,7 @@ const Minimap: React.FC<MinimapProps> = ({
 			let y = offsetY + worldTop * scale;
 			let w = worldW * scale;
 			let h = worldH * scale;
+			// Clamp viewport rectangle to minimap bounds
 			if (w > cityDrawWidth) {
 				w = cityDrawWidth;
 				x = offsetX;
@@ -88,7 +110,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		return { x: 0, y: 0, w: 0, h: 0 };
 	}, [view, scale, offsetX, offsetY, cityDrawWidth, cityDrawHeight, canvasRef]);
 
-	// --- Define centerViewOnMinimap before refs ---
+	// Center the main view on a minimap click/drag
 	const centerViewOnMinimap = useCallback((mouseX: number, mouseY: number) => {
 		const minX = offsetX;
 		const minY = offsetY;
@@ -110,7 +132,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		});
 	}, [offsetX, offsetY, cityDrawWidth, cityDrawHeight, scale, citySize, unit, canvasRef, setView, clampOffset]);
 
-	// Mouse drag logic
+	// Mouse drag logic for minimap viewport
 	const onMinimapMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
 		setIsMinimapDragging(true);
 		const minimapRect = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
@@ -132,7 +154,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		window.addEventListener('mouseup', onUp);
 	};
 
-	// Touch drag logic
+	// Touch drag logic for minimap viewport
 	const onMinimapTouchStart = (e: React.TouchEvent<SVGSVGElement>) => {
 		if (e.touches.length === 1) {
 			setIsMinimapDragging(true);
@@ -160,7 +182,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		}
 	};
 
-	// --- Resizing logic ---
+	// --- Resizing logic for minimap ---
 	const [isResizing, setIsResizing] = useState<null | 'left' | 'top'>(null);
 	const dragStart = useRef({ x: 0, y: 0, size: minimapMaxSize });
 
@@ -189,6 +211,7 @@ const Minimap: React.FC<MinimapProps> = ({
 		if (e.preventDefault) e.preventDefault();
 	};
 
+	// Handle minimap resizing with mouse/touch
 	useEffect(() => {
 		if (!isResizing) return;
 		function onMove(e: MouseEvent | TouchEvent) {
@@ -228,35 +251,35 @@ const Minimap: React.FC<MinimapProps> = ({
 		};
 	}, [isResizing, setMinimapMaxSize]);
 
+	// Render minimap SVG, resize handles, and viewport rectangle
 	return (
 		<div
 			id="minimap-container"
 			className={isMinimapDragging ? 'minimap-dragging' : ''}
-			style={{ width: minimapWidth, height: minimapHeight, position: 'fixed', right: 0, bottom: 0, zIndex: 100 }}
+			style={{ width: minimapWidth, height: minimapHeight }}
 		>
 			{/* Left resize handle */}
 			<div
 				className="minimap-resize-handle left"
-				style={{ position: 'absolute', left: 0, top: 0, height: minimapHeight, width: 8, cursor: 'ew-resize', zIndex: 10 }}
+				style={{ height: minimapHeight }}
 				onMouseDown={onMinimapLeftResize}
 				onTouchStart={onMinimapLeftResize}
 			>
-				<div style={{ width: 4, height: minimapHeight * 0.5, background: '#2a5cff', borderRadius: 2, marginTop: minimapHeight * 0.25 }} />
+				<div style={{ height: minimapHeight * 0.5, marginTop: minimapHeight * 0.25 }} />
 			</div>
 			{/* Top resize handle */}
 			<div
 				className="minimap-resize-handle top"
-				style={{ position: 'absolute', left: 0, top: 0, width: minimapWidth, height: 8, cursor: 'ns-resize', zIndex: 10 }}
+				style={{ width: minimapWidth }}
 				onMouseDown={onMinimapTopResize}
 				onTouchStart={onMinimapTopResize}
 			>
-				<div style={{ height: 4, width: minimapWidth * 0.5, background: '#2a5cff', margin: 'auto', borderRadius: 2, marginLeft: minimapWidth * 0.25 }} />
+				<div style={{ width: minimapWidth * 0.5, marginLeft: minimapWidth * 0.25 }} />
 			</div>
 			<svg
 				ref={minimapRef}
 				width={minimapWidth}
 				height={minimapHeight}
-				style={{ display: 'block' }}
 				onMouseDown={onMinimapMouseDown}
 				onTouchStart={onMinimapTouchStart}
 			>
@@ -281,7 +304,7 @@ const Minimap: React.FC<MinimapProps> = ({
 				/>
 			</svg>
 		</div>
-	);
-};
+	)
+}
 
-export default Minimap;
+export default Minimap

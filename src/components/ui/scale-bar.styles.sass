@@ -1,0 +1,38 @@
+#scale-bar
+	position: fixed
+	bottom: 24px
+	left: 24px
+	z-index: 10
+	display: flex
+	align-items: center
+	gap: 12px
+	background: rgba(255,255,255,0.85)
+	border-radius: 8px
+	padding: 6px 14px
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08)
+
+.scale-bar-line
+	height: 6px
+	background: #333
+	border-radius: 3px
+	margin-right: 8px
+	min-width: 40px
+	max-width: 200px
+	display: inline-block
+
+.scale-bar-label
+	font-size: 1.1em
+	color: #222
+	margin-right: 10px
+
+.scale-bar-toggle
+	font-size: 0.95em
+	padding: 3px 10px
+	border-radius: 5px
+	border: 1px solid #888
+	background: #444444
+	cursor: pointer
+	transition: background 0.2s
+
+	&:hover
+		background: #406f8a

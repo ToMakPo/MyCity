@@ -1,0 +1,46 @@
+.ui-pan-buttons
+	display: block
+	position: relative
+	width: 100px
+	height: 100px
+	margin-top: 16px
+
+	.donut-button
+		cursor: pointer
+		fill: var(--button-bg)
+		
+	.donut-arrow
+		fill: var(--button-text-color)
+
+#zoom-controles
+	--bg-color: #f3fcffdd
+	display: flex
+	align-items: center
+	gap: 12px
+	padding: 8px
+	border-radius: 36px
+	background-color: var(--bg-color)
+	box-shadow: 0 0 10px 10px var(--bg-color)
+
+	.ui-zoom-button
+		--btn-size: 36px
+
+		display: inline-flex
+		align-items: center
+		justify-content: center
+		width: var(--btn-size)
+		height: var(--btn-size)
+		background-color: var(--button-bg)
+		border-radius: 50%
+		cursor: pointer
+		-webkit-user-select: none
+		user-select: none
+
+		svg
+			fill: var(--button-text-color)
+	
+	.zoom-label
+		width: 100px
+		display: inline-block
+		text-align: center
+		font-weight: bold

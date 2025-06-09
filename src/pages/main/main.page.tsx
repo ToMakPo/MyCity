@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Minimap from '../../components/ui/Minimap';
-import SettingsMenu from '../../components/ui/SettingsMenu'
-import PanZoomControls from '../../components/ui/PanZoomControls'
-import ScaleBar from '../../components/ui/ScaleBar'
+import Minimap from '../../components/ui/minimap.component';
+import SettingsMenu from '../../components/ui/settings-menu.component'
+import PanZoomControls from '../../components/ui/pan-zoom-controls.component'
+import ScaleBar from '../../components/ui/scale-bar.component'
 import './main.styles.sass'
 
 const UNITS = [

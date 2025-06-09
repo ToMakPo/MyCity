@@ -1,0 +1,42 @@
+#minimap-container
+	position: fixed
+	right: 0
+	bottom: 0
+	z-index: 100
+	margin: 0 !important
+	background: none
+	pointer-events: auto
+
+	#minimap
+		background: #fff
+		border-radius: 8px
+		box-shadow: 0 2px 8px rgba(0,0,0,0.12)
+		display: block
+
+		&.dragging, &.dragging *
+			cursor: none !important
+
+	.minimap-resize-handle
+		--size: 4px
+		--gap: 10px
+		--color: #1f5e69
+		position: absolute
+		left: 0
+		top: 0
+		z-index: 10
+
+		&.left
+			cursor: ew-resize
+		
+			div
+				width: var(--size)
+
+		&.top
+			cursor: ns-resize
+
+			div
+				height: var(--size)
+		
+		div
+			background-color: var(--color)
+			border-radius: 2px
