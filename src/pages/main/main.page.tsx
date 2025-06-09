@@ -295,12 +295,7 @@ function MainPage() {
           {unit.short} (X)
           <input
             type="number"
-            min={0.1}            git init
-            git add .
-            git commit -m "Initial commit"
-            git branch -M main
-            git remote add origin https://github.com/your-username/your-repo-name.git
-            git push -u origin main
+            min={0.1}
             step={0.1}
             value={citySize.y}
             onChange={e => setCitySize(s => ({ ...s, y: Number(e.target.value) }))}
