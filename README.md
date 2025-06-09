@@ -1,54 +1,69 @@
-# React + TypeScript + Vite
+# MyCity: City Simulation Sandbox
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MyCity is a modern city simulation sandbox app built with React, TypeScript, Vite, and SASS. It features a customizable, grid-based map with smooth panning, zooming, unit switching, a resizable minimap, and a visually accurate scale bar. The app is designed for robust desktop and touch controls, providing a stable and user-friendly UI/UX.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Customizable City Size:** Set city dimensions in miles or kilometers, with instant unit switching and accurate conversion.
+- **Grid-Based Map:** Full-screen, high-performance canvas rendering with a visually accurate grid.
+- **Smooth Pan & Zoom:** Mouse, touch, and UI controls for panning and zooming, with min/max constraints and continuous action support.
+- **Resizable Minimap:** Always matches city aspect ratio, flush to the edge, with draggable/resizable viewport and handles.
+- **Scale Bar:** Accurately reflects real-world distances in both mi/ft and km/m, dynamically updates with zoom and unit changes.
+- **Robust Controls:** Desktop and touch support, continuous pan/zoom buttons, and a stable, intuitive UI.
 
-## Expanding the ESLint configuration
+## Screenshots
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+![MyCity Screenshot](public/screenshot.png) <!-- Add a screenshot if available -->
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or newer recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Installation
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/<your-username>/MyCity.git
+   cd MyCity
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## Usage
+
+- **Pan/Zoom:** Use mouse, touch, or on-screen controls to pan and zoom the map. Hold pan/zoom buttons for continuous movement.
+- **Resize Minimap:** Drag handles on the minimap to resize while maintaining aspect ratio.
+- **Switch Units:** Toggle between miles and kilometers in the city size input area.
+- **Adjust City Size:** Enter new dimensions to resize the city grid.
+
+## Project Structure
+
+- `src/pages/main/main.page.tsx` — Main logic/UI, minimap, pan/zoom, resizing, and controls
+- `src/pages/main/main.styles.sass` — SASS styles for the main page and minimap
+- `src/index.sass` — Global styles
+- `public/` — Static assets (add a screenshot here for the README)
+
+## Contributing
+
+Contributions are welcome! Please open issues or submit pull requests for new features, bug fixes, or improvements.
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+*Created with Vite, React, TypeScript, and SASS.*
