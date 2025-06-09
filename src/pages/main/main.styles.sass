@@ -33,66 +33,6 @@
 	flex-direction: column
 	gap: 8px
 
-.ui-pan-buttons
-	display: block
-	position: relative
-
-	.donut-button
-		cursor: pointer
-		fill: var(--button-bg)
-	
-	.donut-arrow
-		fill: var(--button-text-color)
-
-#ui-controls button
-	padding: 6px 12px
-	font-size: 1.1em
-	border-radius: 6px
-	border: 1px solid #888
-	background: #444444
-	cursor: pointer
-	transition: background 0.2s
-	&:hover
-		background: #406f8a
-
-#scale-bar
-	position: fixed
-	bottom: 24px
-	left: 24px
-	z-index: 10
-	display: flex
-	align-items: center
-	gap: 12px
-	background: rgba(255,255,255,0.85)
-	border-radius: 8px
-	padding: 6px 14px
-	box-shadow: 0 2px 8px rgba(0,0,0,0.08)
-
-.scale-bar-line
-	height: 6px
-	background: #333
-	border-radius: 3px
-	margin-right: 8px
-	min-width: 40px
-	max-width: 200px
-	display: inline-block
-
-.scale-bar-label
-	font-size: 1.1em
-	color: #222
-	margin-right: 10px
-
-.scale-bar-toggle
-	font-size: 0.95em
-	padding: 3px 10px
-	border-radius: 5px
-	border: 1px solid #888
-	background: #444444
-	cursor: pointer
-	transition: background 0.2s
-	&:hover
-		background: #406f8a
-
 #city-size-input
 	margin-bottom: 12px
 	label
@@ -114,20 +54,17 @@
 			margin-left: 8px
 			margin-right: 4px
 
-#minimap-container
+#ui-bottom
 	position: fixed
-	right: 0
-	bottom: 0
+	inset: auto 0 0 0
 	z-index: 100
-	margin: 0 !important
-	background: none
-	pointer-events: auto
+	width: 100vw
+	height: min-content
 
-	#minimap
-		background: #fff
-		border-radius: 8px
-		box-shadow: 0 2px 8px rgba(0,0,0,0.12)
-		display: block
+	#minimap-container, #scale-bar
+		position: absolute
+		bottom: 100%
 
-	&.dragging, &.dragging *
-		cursor: none !important
+	#control-panel
+		position: relative
+		transition: 0.15s ease
