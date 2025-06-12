@@ -16,14 +16,15 @@
 		position: absolute
 		top: -20px
 		left: 50%
-		display: block
+		transform: translateX(-50%)
+		display: flex
+		margin-left: -1.5rem
 		background-color: var(--button-bg)
 		color: var(--button-fg)
 		height: fit-content !important
 		cursor: pointer
 		padding: 0.1rem 1rem
 		border-radius: 4px
-		transform: translateX(-50%)
 		
 		&:is(:hover, :focus-visible)
 			background-color: var(--primary-color)
