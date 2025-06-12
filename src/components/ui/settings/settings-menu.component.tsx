@@ -1,5 +1,5 @@
 // SettingsMenu.tsx
-import React, { useState } from 'react'
+import React from 'react'
 import CitySizeInput from './city-size-input.component'
 import type { CitySizeInputProps } from './city-size-input.component'
 import './settings-menu.styles.sass'
@@ -9,14 +9,14 @@ import './settings-menu.styles.sass'
  * @property citySizeInputProps - Props to pass to the CitySizeInput component.
  */
 interface SettingsMenuProps {
-	citySizeInputProps: CitySizeInputProps
+	citySizeInputProps: CitySizeInputProps;
+	open: boolean;
+	setOpen: (open: boolean) => void;
 	// Add more props for future settings here
 }
 
 /** Collapsible settings menu that slides in from the right. */
-const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
-	const [open, setOpen] = useState(false)
-
+const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps, open, setOpen }) => {
 	return (<>
 		{/* Hamburger button to toggle settings menu */}
 		<span
@@ -25,7 +25,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 			aria-label={open ? 'Close settings' : 'Open settings'}
 			aria-expanded={open}
 			aria-controls="settings-panel"
-			onClick={() => setOpen(o => !o)}
+			onClick={() => setOpen(!open)}
 			role='button'
 		>
 			{open ? (

@@ -78,6 +78,7 @@ function MainPage() {
 	// --- Control panel state ---
 	const [buildMode, setBuildMode] = useState(false);
 	const [activeBuildMode, setActiveBuildMode] = useState<BuildMode>('none');
+	const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
 
 	// --- Control panel handlers ---
 	const handleToggleBuildMode = () => {
@@ -474,6 +475,59 @@ function MainPage() {
 		return () => window.removeEventListener('wheel', handleGlobalWheel);
 	}, []);
 
+	// Keyboard shortcuts for zoom and pan
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			// Disable shortcuts if settings menu is open or focus is in input/textarea/select/contenteditable
+			const active = document.activeElement;
+			const isInput = active && (
+				active.tagName === 'INPUT' ||
+				active.tagName === 'TEXTAREA' ||
+				active.tagName === 'SELECT' ||
+				(active as HTMLElement).isContentEditable
+			);
+			if (settingsMenuOpen || isInput) return;
+
+			// If control panel is open, skip map pan/zoom
+			if (buildMode) return;
+
+			// If in build mode and an item is selected, skip map pan/zoom (let build tool handle)
+			if (buildMode && activeBuildMode && activeBuildMode !== 'none') {
+				return;
+			}
+
+			// Map pan: Arrow keys and WASD
+			if (["ArrowUp", "w", "W"].includes(e.key)) {
+				doSinglePan('up');
+				e.preventDefault();
+			}
+			if (["ArrowDown", "s", "S"].includes(e.key)) {
+				doSinglePan('down');
+				e.preventDefault();
+			}
+			if (["ArrowLeft", "a", "A"].includes(e.key)) {
+				doSinglePan('left');
+				e.preventDefault();
+			}
+			if (["ArrowRight", "d", "D"].includes(e.key)) {
+				doSinglePan('right');
+				e.preventDefault();
+			}
+
+			// Map zoom: +, =, -, _ (on main and numpad)
+			if (["=", "+", "NumpadAdd"].includes(e.key) || (e.key === "+" && e.shiftKey)) {
+				doSingleZoom('in');
+				e.preventDefault();
+			}
+			if (["-", "_", "NumpadSubtract"].includes(e.key)) {
+				doSingleZoom('out');
+				e.preventDefault();
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [settingsMenuOpen, buildMode, activeBuildMode, doSinglePan, doSingleZoom]);
+
 	// Only render after loaded, but always call all hooks
 	const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
 	return (
@@ -490,6 +544,8 @@ function MainPage() {
 								unit,
 								onUnitToggle: handleUnitToggle,
 							}}
+							open={settingsMenuOpen}
+							setOpen={setSettingsMenuOpen}
 						/>
 						<PanZoomControls
 							onZoomIn={() => doSingleZoom('in')}
