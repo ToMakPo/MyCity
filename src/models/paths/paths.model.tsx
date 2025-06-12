@@ -27,7 +27,7 @@ Intersections need to be able to affect how traffic flows. Some intersections wi
 
 The user should be able to go into build mode to add and modify roads as needed by moving nodes and curve anchor points. The user should be able to split a segment by adding a node in the middle. The user will need to be able to show how segments link to other segments when the lane splits or merges or when at an intersection. The user will also need to be able to control if an intersection is a stop/yield or a light.
 
-I think the best way to handle nodes to to have one node the controles the road and a number of small nodes that control each path of the road. The main node will be used to move the road and the small nodes will be used to connect the paths from one road segment to another.
+I think the best way to handle nodes to to have one node the controls the road and a number of small nodes that control each path of the road. The main node will be used to move the road and the small nodes will be used to connect the paths from one road segment to another.
 
 Each road segment can have its own properties and the paths can inherit properties from the segment, but individual paths can override those properties. For example, a road segment might have a speed limit of 30 mph, but a turn lane might have a speed limit of 10 mph. The road segment might be made of asphalt, but the sidewalk might be made of concrete. The road segment might be for cars, but the bike lane might be for bikes only.
 
