@@ -1,6 +1,6 @@
 // CitySizeInput.tsx
 import React from 'react'
-import type { Unit } from '../../pages/main/types'
+import type { Unit } from '../../../pages/main/types'
 import './city-size-input.styles.sass'
 
 /**

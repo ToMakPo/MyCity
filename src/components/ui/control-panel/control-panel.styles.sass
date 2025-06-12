@@ -1,0 +1,62 @@
+#control-panel
+	background: #f8fafc
+	border-radius: 8px 8px 0 0
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08)
+	padding: 1rem 1.5rem
+	margin: 0
+	display: flex
+	gap: 1rem
+	width: 100vw
+	height: fit-content
+	z-index: 100
+	transition: 0.3s ease-in-out
+	position: relative
+	
+	#control-panel-toggle
+		position: absolute
+		top: -20px
+		left: 50%
+		display: block
+		background-color: var(--button-bg)
+		color: var(--button-fg)
+		height: fit-content !important
+		cursor: pointer
+		padding: 0.1rem 1rem
+		border-radius: 4px
+		transform: translateX(-50%)
+
+		&::before
+			content: '▼'
+
+	&.hide
+		&, :not(#control-panel-toggle)
+			height: 0 !important
+			padding-top: 0 !important
+			padding-bottom: 0 !important
+			gap: 0 !important
+
+		#control-panel-toggle
+			top: -25px
+			
+			&::before
+				content: '▲'
+
+.build-mode-btn
+	border-radius: 50%
+	width: 44px
+	height: 44px
+	display: flex
+	align-items: center
+	justify-content: center
+	background: var(--button-bg)
+	border: none
+	color: var(--button-fg)
+	font-size: 1.5rem
+	cursor: pointer
+	transition: background 0.2s, color 0.2s
+	box-shadow: 0 1px 4px rgba(0,0,0,0.06)
+	margin: 0 0.5rem
+
+.build-mode-btn.active
+	background: var(--primary-color)
+	color: var(--button-fg)

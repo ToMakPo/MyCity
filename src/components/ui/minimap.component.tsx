@@ -1,7 +1,7 @@
 // Minimap.tsx
 import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import type { ViewState, Unit } from '../../pages/main/types'
-import type { CitySizeInputProps } from './city-size-input.component'
+import type { CitySizeInputProps } from './settings/city-size-input.component'
 import './minimap.styles.sass'
 
 /**

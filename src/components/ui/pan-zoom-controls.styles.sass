@@ -8,11 +8,14 @@
 	.donut-button
 		cursor: pointer
 		fill: var(--button-bg)
+
+		&:hover
+			fill: var(--primary-color)
 		
 	.donut-arrow
-		fill: var(--button-text-color)
+		fill: var(--button-fg)
 
-#zoom-controles
+#zoom-controls
 	--bg-color: #f3fcffdd
 	display: flex
 	align-items: center
@@ -38,7 +41,10 @@
 		user-select: none
 
 		svg
-			fill: var(--button-text-color)
+			fill: var(--button-fg)
+
+		&:hover
+			background-color: var(--primary-color)
 	
 	.zoom-label
 		width: 100px

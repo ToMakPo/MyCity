@@ -1,3 +1,4 @@
+import React from 'react';
 import './control-panel.styles.sass';
 import { FaHammer } from 'react-icons/fa';
 
@@ -19,6 +20,8 @@ const buildModes: { mode: BuildMode; label: string }[] = [
 ];
 
 export default function ControlPanel(props: ControlPanelProps) {
+	const [opened, setOpen] = React.useState(false);
+
 	const {
 		buildMode,
 		onToggleBuildMode,
@@ -27,25 +30,33 @@ export default function ControlPanel(props: ControlPanelProps) {
 	} = props;
 
 	return (
-		<div id="control-panel">
+		<div id="control-panel" className={opened ? '' : 'hide'}>
 			<div className="sim-controls">
-				<button onClick={onToggleBuildMode} className={buildMode ? 'active buildmode-btn' : 'buildmode-btn'} title={buildMode ? 'Exit Build Mode' : 'Enter Build Mode'}>
+				<span role='button' 
+					onClick={onToggleBuildMode} 
+					className={buildMode ? 'active build-mode-btn' : 'build-mode-btn'} 
+					title={buildMode ? 'Exit Build Mode' : 'Enter Build Mode'}>
 					<FaHammer />
-				</button>
+				</span>
 			</div>
 			{buildMode && (
 				<div className="build-modes">
 					{buildModes.map(({ mode, label }) => (
-						<button
+						<span
+							role='button'
 							key={mode}
 							className={activeBuildMode === mode ? 'active' : ''}
 							onClick={() => onSetBuildMode(mode)}
 						>
 							{label}
-						</button>
+						</span>
 					))}
 				</div>
 			)}
+
+			<div id='control-panel-toggle'
+				title={opened ? 'Close Control Panel' : 'Open Control Panel'}
+				onClick={() => setOpen(!opened)}></div>
 		</div>
 	);
 }

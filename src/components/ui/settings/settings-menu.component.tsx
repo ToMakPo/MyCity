@@ -21,7 +21,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 		{/* Hamburger button to toggle settings menu */}
 		<span
 			id='settings-toggle'
-			className="settings-hamburger"
+			className="settings-hamburger icon-btn"
 			aria-label={open ? 'Close settings' : 'Open settings'}
 			aria-expanded={open}
 			aria-controls="settings-panel"
@@ -60,7 +60,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 			<div id='units-toggle'>
 				<h3>Units:</h3>
 				<button
-					className="scale-bar-toggle"
+					className="toggle-button"
 					onClick={citySizeInputProps.onUnitToggle}
 				>
 					{citySizeInputProps.unit.label}
@@ -71,13 +71,12 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ citySizeInputProps }) => {
 		</div>
 
 		{/* Overlay to close settings when clicking outside */}
-		{open && (
-			<div
-				id="settings-overlay"
-				onClick={() => setOpen(false)}
-				aria-hidden="true"
-			/>
-		)}
+		<div
+			id="settings-overlay"
+			className={open ? 'visible' : ''}
+			onClick={() => setOpen(false)}
+			aria-hidden="true"
+		/>
 	</>)
 }
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Minimap from '../../components/ui/minimap.component';
-import SettingsMenu from '../../components/ui/settings-menu.component'
+import SettingsMenu from '../../components/ui/settings/settings-menu.component'
 import PanZoomControls from '../../components/ui/pan-zoom-controls.component'
 import ScaleBar from '../../components/ui/scale-bar.component'
-import ControlPanel from '../../components/ui/control-panel.component';
-import type { BuildMode } from '../../components/ui/control-panel.component';
+import ControlPanel from '../../components/ui/control-panel/control-panel.component';
+import type { BuildMode } from '../../components/ui/control-panel/control-panel.component';
 import './main.styles.sass'
 
 const UNITS = [

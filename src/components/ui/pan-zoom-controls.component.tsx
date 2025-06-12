@@ -47,7 +47,7 @@ const PanZoomControls: React.FC<PanZoomControlsProps> = ({
 	onPanStop,
 }) => (<>
 	{/* Zoom Controls */}
-	<div id='zoom-controles'>
+	<div id='zoom-controls'>
 		{/* Zoom Out Icon Button */}
 		<span
 			className='ui-zoom-button zoom-out'
