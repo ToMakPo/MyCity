@@ -24,7 +24,7 @@ type ViewState = {
 // IndexedDB utility for NoSQL-style persistence
 function openUIStore(): Promise<IDBObjectStore> {
 	return new Promise((resolve, reject) => {
-		const req = indexedDB.open('my-city-ui', 1);
+		const req = indexedDB.open('my-city-db', 1);
 		req.onupgradeneeded = () => {
 			req.result.createObjectStore('ui');
 		};
