@@ -28,7 +28,7 @@ const CitySizeInput: React.FC<CitySizeInputProps> = ({ citySize, setCitySize, un
 		<h3>City Size:</h3>
 
 		<label className="size-label">
-			<strong>X</strong>
+			<strong>Width</strong>
 			<input
 				type="number"
 				min={1}
@@ -41,7 +41,7 @@ const CitySizeInput: React.FC<CitySizeInputProps> = ({ citySize, setCitySize, un
 		</label>
 
 		<label className="size-label">
-			<strong>Y</strong>
+			<strong>Height</strong>
 			<input
 				type="number"
 				min={1}
