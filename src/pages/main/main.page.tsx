@@ -460,6 +460,20 @@ function MainPage() {
 		setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
 	}
 
+	// Prevent browser zooming when ctrl+wheel is used anywhere except the city-canvas
+	useEffect(() => {
+		function handleGlobalWheel(e: WheelEvent) {
+			if (e.ctrlKey) {
+				const isCanvas = (e.target as Element)?.closest?.('#city-canvas');
+				if (!isCanvas) {
+					e.preventDefault();
+				}
+			}
+		}
+		window.addEventListener('wheel', handleGlobalWheel, { passive: false });
+		return () => window.removeEventListener('wheel', handleGlobalWheel);
+	}, []);
+
 	// Only render after loaded, but always call all hooks
 	const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
 	return (
