@@ -146,7 +146,7 @@ function MainPage() {
 	}
 
 	// Clamp offset so the city always stays in view
-	function clampOffset(
+	const clampOffset = React.useCallback((
 		offsetX: number,
 		offsetY: number,
 		zoom: number,
@@ -154,7 +154,7 @@ function MainPage() {
 		canvasHeight: number,
 		citySize: { x: number; y: number },
 		unit: { short: string; scale: number }
-	) {
+	) => {
 		const cityWidthPx = citySize.x * unit.scale * zoom
 		const cityHeightPx = citySize.y * unit.scale * zoom
 		const minOffsetX = Math.min(0, canvasWidth - cityWidthPx)
@@ -165,7 +165,7 @@ function MainPage() {
 			offsetX: Math.max(minOffsetX, Math.min(offsetX, maxOffsetX)),
 			offsetY: Math.max(minOffsetY, Math.min(offsetY, maxOffsetY)),
 		}
-	}
+	}, []);
 
 	// Handle drawing with pan and zoom
 	useEffect(() => {
@@ -297,7 +297,7 @@ function MainPage() {
 			window.removeEventListener('mousemove', handleMouseMove)
 			window.removeEventListener('mouseup', handleMouseUp)
 		}
-	}, [view, citySize, unit])
+	}, [view, citySize, unit, clampOffset])
 
 	// Center map and clamp offset when zoom or city size/unit changes
 	useEffect(() => {
@@ -395,7 +395,7 @@ function MainPage() {
 		window.removeEventListener('mouseup', stopContinuousPan)
 		window.removeEventListener('touchend', stopContinuousPan)
 	}
-	function doSinglePan(direction: 'up' | 'down' | 'left' | 'right') {
+	const doSinglePan = React.useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
 		const panAmount = 80
 		const canvas = canvasRef.current
 		setView(v => {
@@ -408,7 +408,7 @@ function MainPage() {
 			const clamped = clampOffset(next.offsetX, next.offsetY, v.zoom, canvas.width, canvas.height, citySize, unit)
 			return { ...v, offsetX: clamped.offsetX, offsetY: clamped.offsetY }
 		})
-	}
+	}, [canvasRef, clampOffset, citySize, unit])
 
 	function startContinuousZoom(type: 'in' | 'out') {
 		if (zoomIntervalRef.current) clearInterval(zoomIntervalRef.current)
@@ -443,7 +443,7 @@ function MainPage() {
 		window.removeEventListener('mouseup', stopContinuousZoom)
 		window.removeEventListener('touchend', stopContinuousZoom)
 	}
-	function doSingleZoom(type: 'in' | 'out') {
+	const doSingleZoom = React.useCallback((type: 'in' | 'out') => {
 		const canvas = canvasRef.current
 		if (!canvas) return
 		const bounds = getZoomBounds(citySize, unit, canvas.width, canvas.height)
@@ -459,7 +459,7 @@ function MainPage() {
 		const newOffsetY = viewportCenterY - worldCenterY * newZoom
 		const clamped = clampOffset(newOffsetX, newOffsetY, newZoom, canvas.width, canvas.height, citySize, unit)
 		setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
-	}
+	}, [canvasRef, clampOffset, citySize, unit, view.zoom, view.offsetX, view.offsetY])
 
 	// Prevent browser zooming when ctrl+wheel is used anywhere except the city-canvas
 	useEffect(() => {
