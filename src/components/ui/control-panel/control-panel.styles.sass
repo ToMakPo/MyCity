@@ -1,69 +1,219 @@
+@keyframes fadeInPanel
+	from
+		opacity: 0
+		transform: translateY(16px)
+	to
+		opacity: 1
+		transform: translateY(0)
+
 #control-panel
-	background: #f8fafc
-	border-radius: 8px 8px 0 0
-	box-shadow: 0 2px 8px rgba(0,0,0,0.08)
-	padding: 1rem 1.5rem
-	margin: 0
 	display: flex
-	gap: 1rem
+	align-items: stretch
+	padding: 0.5rem 1rem
+	gap: 2rem
 	width: 100vw
 	height: fit-content
 	z-index: 100
-	transition: 0.3s ease-in-out
-	position: relative
-	
-	#control-panel-toggle
-		position: absolute
-		top: -20px
-		left: 50%
-		transform: translateX(-50%)
-		display: flex
-		margin-left: -1.5rem
-		background-color: var(--button-bg)
-		color: var(--button-fg)
-		height: fit-content !important
-		cursor: pointer
-		padding: 0.1rem 1rem
-		border-radius: 4px
-		
-		&:is(:hover, :focus-visible)
-			background-color: var(--primary-color)
+	background: var(--bg-color)
+	border-top: 3px double var(--fg-color)
 
-		&::before
-			content: '▼'
+	*
+		transition: all 0.35s ease
 
+	// Collapsed state
 	&.hide
-		&, :not(#control-panel-toggle)
-			height: 0 !important
+		&, & > *:not(:last-child) *
+			height: 0rem !important
+			min-height: 0rem !important
+			max-height: 0rem !important
 			padding-top: 0 !important
 			padding-bottom: 0 !important
-			gap: 0 !important
+			margin-top: 0 !important
+			margin-bottom: 0 !important
+			-webkit-user-select: none !important
+			user-select: none !important
+			font-size: 0 !important
 
-		#control-panel-toggle
-			top: -25px
+	#controls
+		flex: 0 1 auto
+		display: flex
+		flex-direction: row
+		flex-wrap: wrap
+		align-items: center
+		gap: 0.5rem
+		transition: 0.35s ease
+
+		.control-btn
+			display: inline-flex
+			align-items: center
+			justify-content: center
+			--size: 3rem
+			width: var(--size)
+			height: var(--size)
+			border-radius: calc(var(--size) / 2)
+			outline: none
+
+			&.active, &[aria-pressed="true"]
+				background-color: var(--primary-color)
+
+			svg
+				font-size: calc(var(--size) * 0.5)
+
+	#build-options
+		flex: 0 1 auto
+		display: flex
+		flex-direction: row
+		flex-wrap: wrap
+		align-items: center
+		gap: 0.5rem
+		padding: 0.25rem 0.75rem
+		border: 1px solid var(--fg-color)
+		border-radius: 8px
+		transition: 0.35s ease
+
+		.option-btn
+			display: inline-flex
+			align-items: center
+			justify-content: center
+			--size: 3rem
+			width: var(--size)
+			height: var(--size)
+			border-radius: calc(var(--size) / 2)
+			font-size: calc(var(--size) * 0.6)
+			outline: none
+
+			&.active, &[aria-pressed="true"]
+				background-color: var(--primary-color)
+	
+	#build-tools
+		display: flex
+		flex-direction: row
+		align-items: center
+		gap: 0.4rem
+		padding: 0
+		background: var(--bg-color)
+		border: 1px solid var(--fg-color)
+		border-radius: 8px
+		transition: 0.35s ease
+
+		.build-group
+			display: flex
+			flex-direction: row
+			align-items: center
+			gap: 0.4rem
+			padding: 0.25rem 0.5rem
+			border-right: 1px solid var(--fg-color)
+			position: relative
+			transition: 0.35s ease
+
+			&:last-child
+				border-right: none
+
+			.tool-header
+				position: absolute
+				top: 0.45em
+				left: 0.75em
+				transform: translateY(-100%)
+				font-size: 0.55rem
+				font-weight: 500
+				color: var(--fg-color)
+				letter-spacing: 0.01em
+				text-shadow: none
+				opacity: 0.92
+				pointer-events: none
+				margin: 0
+				padding: 0 0.35em
+				background: var(--bg-color)
+				line-heights: 1cap
+				z-index: 1
+				transition: 0.35s ease
 			
-			&::before
-				content: '▲'
+			.build-option-btn
+				display: flex
+				flex-direction: column
+				align-items: center
+				justify-content: center
+				background: var(--button-bg)
+				color: var(--button-fg)
+				--size: 3rem
+				width: var(--size)
+				height: var(--size)
+				border-radius: calc(var(--size) / 2)
+				outline: none
+				transition: 0.35s ease
 
-.build-mode-btn
-	border-radius: 50%
-	width: 44px
-	height: 44px
+				&.active, &[aria-pressed="true"]
+					background: var(--primary-color)
+
+	#build-tools:empty
+		display: none
+
+	[data-tooltip]
+		position: relative
+
+		&::after
+			content: attr(data-tooltip)
+			position: absolute
+			left: 50%
+			top: -0.25rem
+			transform: translate(-50%, -100%)
+			font-size: 0.85rem
+			background: var(--fg-color)
+			color: var(--bg-color)
+			font-size: 0.95rem
+			padding: 0.25em 0.7em
+			border-radius: 4px
+			white-space: nowrap
+			opacity: 0
+			pointer-events: none
+			transition: 0.35s ease
+			z-index: 10
+
+		&:is(:hover, :focus-visible)::after
+			opacity: 1
+		
+		&.left::after
+			left: 0
+			transform: translate(0, -100%)
+		
+		&.right::after
+			left: 100%
+			transform: translate(-100%, -100%)
+
+#control-panel-toggle
 	display: flex
 	align-items: center
 	justify-content: center
+	position: absolute
+	left: 50%
+	margin-left: -1rem
+	transform: translateX(-50%)
 	background: var(--button-bg)
-	border: none
 	color: var(--button-fg)
+	border-radius: 3px
+	line-height: 1ex
+	transition: 0.35s ease
 	font-size: 1.5rem
-	cursor: pointer
-	transition: background 0.2s, color 0.2s
-	box-shadow: 0 1px 4px rgba(0,0,0,0.06)
-	margin: 0 0.5rem
+	padding: 0.5rem 1rem
+	
+	&::before
+		display: inline-block
+		content: ""
+		width: 0
+		height: 0
+		border: 0.5rem solid transparent
+		transition: 0.35s ease
 
-	&:is(:hover, :focus-visible)
-		background: var(--primary-color)
-
-.build-mode-btn.active
-	background: var(--primary-color)
-	color: var(--button-fg)
+	&.closed
+		top: -1.5rem
+		
+		&::before
+			border-top-width: 0
+			border-bottom-color: var(--button-fg)
+	
+	&:not(.closed)
+		top: -0.5rem
+		
+		&::before
+			border-bottom-width: 0
+			border-top-color: var(--button-fg)
