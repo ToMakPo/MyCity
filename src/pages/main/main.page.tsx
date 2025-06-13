@@ -79,6 +79,12 @@ function MainPage() {
 	const zoomIntervalRef = React.useRef<number | null>(null)
 
 	const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+	const [mode, setMode] = useState<string | null>(null);
+	const [option, setOption] = useState<string | null>(null);
+	const [action, setAction] = useState<string | null>(null);
+	const [buildMode, setBuildMode] = useState(false);
+
+	const handleToggleBuildMode = () => setBuildMode(b => !b);
 
 	// Load persisted state from IndexedDB on mount, then set loaded=true
 	React.useEffect(() => {
@@ -507,6 +513,17 @@ function MainPage() {
 		viewRef.current = view
 	}, [view])
 
+	// Custom cursor for add-road tool
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		if (mode === 'build' && option === 'roads' && action === 'add-road') {
+			canvas.style.cursor = 'crosshair';
+		} else {
+			canvas.style.cursor = '';
+		}
+	}, [mode, option, action]);
+
 	// Only render after loaded, but always call all hooks
 	const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
 	return (
@@ -579,6 +596,14 @@ function MainPage() {
 								clampOffset={clampOffset}
 							/>
 							<ControlPanel
+								buildMode={buildMode}
+								onToggleBuildMode={handleToggleBuildMode}
+								mode={mode}
+								setMode={setMode}
+								option={option}
+								setOption={setOption}
+								action={action}
+								setAction={setAction}
 							/>
 						</div>
 					</div>

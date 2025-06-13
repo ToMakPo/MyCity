@@ -7,6 +7,12 @@ export type BuildMode = 'none' | 'road' | 'water' | 'terrain' | 'building' | 'zo
 export interface ControlPanelProps {
 	buildMode: boolean;
 	onToggleBuildMode: () => void;
+	mode: string | null;
+	setMode: (mode: string | null) => void;
+	option: string | null;
+	setOption: (option: string | null) => void;
+	action: string | null;
+	setAction: (action: string | null) => void;
 }
 
 export interface ControlPanelDesign {
@@ -54,22 +60,20 @@ const design = [
 	] },
 ] as unknown as ControlPanelDesign[]
 
-export default function ControlPanel() {
+export default function ControlPanel(props: ControlPanelProps) {
+	const { mode, setMode, option, setOption, action, setAction } = props;
 	const [opened, setOpen] = useState(true);
-	const [mode, setMode] = useState<string | null>(null);
-	const [option, setOption] = useState<string | null>(null);
-	const [action, setAction] = useState<string | null>(null);
 
 	const modeItem = design.find(md => md.key === mode);
 	const optionItem = modeItem?.options?.find(opt => opt.key === option);
 	
 	useEffect(() => {
 		setOption(null);
-	}, [mode]);
+	}, [mode, setOption]);
 
 	useEffect(() => {
 		setAction(null);
-	}, [option]);
+	}, [option, setAction]);
 
 	return (
 		<div id="control-panel" className={opened ? '' : 'hide'}>
