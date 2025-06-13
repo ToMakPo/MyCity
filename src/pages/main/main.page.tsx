@@ -66,6 +66,10 @@ function MainPage() {
 		startPanX: 0,
 		startPanY: 0,
 	})
+	const viewRef = React.useRef(view)
+	const isDraggingRef = React.useRef(false)
+	const startPanMouseRef = React.useRef({ x: 0, y: 0 })
+	const startPanOffsetRef = React.useRef({ x: 0, y: 0 })
 	const [unitIndex, setUnitIndex] = useState(0)
 	const [citySize, setCitySize] = useState({ x: 15, y: 15 })
 	const [minimapMaxSize, setMinimapMaxSize] = React.useState(180)
@@ -226,52 +230,44 @@ function MainPage() {
 		const handleWheel = (e: WheelEvent) => {
 			e.preventDefault()
 			const { minZoom, maxZoom } = getZoomBounds(citySize, unit, canvas.width, canvas.height)
-			if (e.ctrlKey) {
-				// Zoom in/out, keeping mouse position fixed in world coords
-				const zoomIntensity = 0.1
-				let newZoom = view.zoom * (e.deltaY < 0 ? 1 + zoomIntensity : 1 - zoomIntensity)
-				newZoom = Math.max(minZoom, Math.min(newZoom, maxZoom))
-				const rect = canvas.getBoundingClientRect()
-				const mouseX = e.clientX - rect.left
-				const mouseY = e.clientY - rect.top
-				const worldX = (mouseX - view.offsetX) / view.zoom
-				const worldY = (mouseY - view.offsetY) / view.zoom
-				const newOffsetX = mouseX - worldX * newZoom
-				const newOffsetY = mouseY - worldY * newZoom
-				const clamped = clampOffset(newOffsetX, newOffsetY, newZoom, canvas.width, canvas.height, citySize, unit)
-				setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
-			} else if (e.shiftKey) {
-				// Pan horizontally
-				const clamped = clampOffset(view.offsetX - e.deltaY, view.offsetY, view.zoom, canvas.width, canvas.height, citySize, unit)
-				setView(v => ({ ...v, offsetX: clamped.offsetX }))
-			} else {
-				// Pan vertically
-				const clamped = clampOffset(view.offsetX, view.offsetY - e.deltaY, view.zoom, canvas.width, canvas.height, citySize, unit)
-				setView(v => ({ ...v, offsetY: clamped.offsetY }))
-			}
+			// Always zoom in/out, centered on mouse
+			const zoomIntensity = 0.1
+			let newZoom = view.zoom * (e.deltaY < 0 ? 1 + zoomIntensity : 1 - zoomIntensity)
+			newZoom = Math.max(minZoom, Math.min(newZoom, maxZoom))
+			const rect = canvas.getBoundingClientRect()
+			const mouseX = e.clientX - rect.left
+			const mouseY = e.clientY - rect.top
+			const worldX = (mouseX - view.offsetX) / view.zoom
+			const worldY = (mouseY - view.offsetY) / view.zoom
+			const newOffsetX = mouseX - worldX * newZoom
+			const newOffsetY = mouseY - worldY * newZoom
+			const clamped = clampOffset(newOffsetX, newOffsetY, newZoom, canvas.width, canvas.height, citySize, unit)
+			setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
 		}
 
-		let isDragging = false
 		let lastX = 0
 		let lastY = 0
 
 		const handleMouseDown = (e: MouseEvent) => {
-			isDragging = true
-			lastX = e.clientX
-			lastY = e.clientY
+			if (e.button !== 1) return // Only pan with middle mouse button
+			isDraggingRef.current = true
+			startPanMouseRef.current = { x: e.clientX, y: e.clientY }
+			startPanOffsetRef.current = { x: viewRef.current.offsetX, y: viewRef.current.offsetY }
 			setView(v => ({ ...v, isPanning: true, startPanX: e.clientX, startPanY: e.clientY }))
 		}
 		const handleMouseMove = (e: MouseEvent) => {
-			if (!isDragging) return
-			const dx = e.clientX - lastX
-			const dy = e.clientY - lastY
-			lastX = e.clientX
-			lastY = e.clientY
-			const clamped = clampOffset(view.offsetX + dx, view.offsetY + dy, view.zoom, canvas.width, canvas.height, citySize, unit)
-			setView(v => ({ ...v, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
+			if (!isDraggingRef.current) return
+			const dx = e.clientX - startPanMouseRef.current.x
+			const dy = e.clientY - startPanMouseRef.current.y
+			const newOffsetX = startPanOffsetRef.current.x + dx
+			const newOffsetY = startPanOffsetRef.current.y + dy
+			const v = viewRef.current
+			const clamped = clampOffset(newOffsetX, newOffsetY, v.zoom, canvas.width, canvas.height, citySize, unit)
+			setView(v2 => ({ ...v2, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
 		}
-		const handleMouseUp = () => {
-			isDragging = false
+		const handleMouseUp = (e: MouseEvent) => {
+			if (e.button !== 1) return // Only end pan for middle mouse button
+			isDraggingRef.current = false
 			setView(v => ({ ...v, isPanning: false }))
 		}
 
@@ -508,6 +504,11 @@ function MainPage() {
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [settingsMenuOpen, doSinglePan, doSingleZoom]);
+
+	// Keep viewRef in sync with view
+	useEffect(() => {
+		viewRef.current = view
+	}, [view])
 
 	// Only render after loaded, but always call all hooks
 	const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
