@@ -79,7 +79,7 @@ export default function ControlPanel() {
 					<span
 						key={md.key}
 						id={`mode-btn--${md.key}`}
-						className={['mode-btn', 'icon-btn', mode === md.key ? 'active' : ''].filter(Boolean).join(' ')}
+						className={['mode-btn', 'icon-btn', 'tgl', mode === md.key ? 'active' : ''].filter(Boolean).join(' ')}
 						onClick={() => setMode(mode !== md.key ? md.key : null)}
 						aria-pressed={mode === md.key}
 						data-tooltip={md.label}
@@ -101,7 +101,7 @@ export default function ControlPanel() {
 						<span
 							key={opt.key}
 							id={`option-btn--${opt.key}`}
-							className={['option-btn', 'icon-btn', option === opt.key ? 'active' : ''].filter(Boolean).join(' ')}
+							className={['option-btn', 'icon-btn', 'tgl', option === opt.key ? 'active' : ''].filter(Boolean).join(' ')}
 							onClick={() => setOption(option !== opt.key ? opt.key : null)}
 							aria-pressed={option === opt.key}
 							data-tooltip={opt.label}
@@ -127,7 +127,7 @@ export default function ControlPanel() {
 								<span
 									key={atn.key}
 									id={`action-btn--${atn.key}`}
-									className={['action-btn', 'icon-btn', action === atn.key ? 'active' : ''].filter(Boolean).join(' ')}
+									className={['action-btn', 'icon-btn', 'tgl', action === atn.key ? 'active' : ''].filter(Boolean).join(' ')}
 									onClick={() => {
 										setAction(action !== atn.key ? atn.key : null)
 										atn.onClick();

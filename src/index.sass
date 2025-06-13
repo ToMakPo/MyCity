@@ -41,8 +41,10 @@ button
 	font-family: inherit
 
 button, .icon-btn
-	background-color: var(--button-bg)
+	--btn-bg: var(--button-bg)
+	background-color: var(--btn-bg)
 	color: var(--button-fg)
+	fill: var(--btn-bg)
 	cursor: pointer
 	transition: 0.35s ease
 	-webkit-user-select: none
@@ -51,9 +53,12 @@ button, .icon-btn
 	&:focus-visible
 		outline: 4px auto -webkit-focus-ring-color
 
-	&:is(:hover, :focus-visible), &:has(:hover, :focus-visible)
-		background-color: var(--primary-color)
-		fill: var(--primary-color)
+	&:is(:not(.tgl), .active):is(:hover, :focus-visible, :has(:hover, :focus-visible))
+		--btn-bg: var(--primary-color)
+	
+	&:active
+		background-color: hsl(from var(--btn-bg) h s calc(l - 10)) !important
+		fill: hsl(from var(--btn-bg) h s calc(l - 10)) !important
 
 input 
 	accent-color: var(--primary-color)
