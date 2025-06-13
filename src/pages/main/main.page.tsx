@@ -4,7 +4,6 @@ import SettingsMenu from '../../components/ui/settings/settings-menu.component'
 import PanZoomControls from '../../components/ui/pan-zoom-controls.component'
 import ScaleBar from '../../components/ui/scale-bar.component'
 import ControlPanel from '../../components/ui/control-panel/control-panel.component';
-import type { BuildMode } from '../../components/ui/control-panel/control-panel.component';
 import './main.styles.sass'
 
 const UNITS = [
@@ -75,17 +74,7 @@ function MainPage() {
 	const panIntervalRef = React.useRef<number | null>(null)
 	const zoomIntervalRef = React.useRef<number | null>(null)
 
-	// --- Control panel state ---
-	const [buildMode, setBuildMode] = useState(false);
-	const [activeBuildMode, setActiveBuildMode] = useState<BuildMode>('none');
 	const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
-
-	// --- Control panel handlers ---
-	const handleToggleBuildMode = () => {
-		setBuildMode(b => !b);
-		if (buildMode) setActiveBuildMode('none');
-	};
-	const handleSetBuildMode = (mode: BuildMode) => setActiveBuildMode(mode);
 
 	// Load persisted state from IndexedDB on mount, then set loaded=true
 	React.useEffect(() => {
@@ -488,14 +477,6 @@ function MainPage() {
 			);
 			if (settingsMenuOpen || isInput) return;
 
-			// If control panel is open, skip map pan/zoom
-			if (buildMode) return;
-
-			// If in build mode and an item is selected, skip map pan/zoom (let build tool handle)
-			if (buildMode && activeBuildMode && activeBuildMode !== 'none') {
-				return;
-			}
-
 			// Map pan: Arrow keys and WASD
 			if (["ArrowUp", "w", "W"].includes(e.key)) {
 				doSinglePan('up');
@@ -526,7 +507,7 @@ function MainPage() {
 		}
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [settingsMenuOpen, buildMode, activeBuildMode, doSinglePan, doSingleZoom]);
+	}, [settingsMenuOpen, doSinglePan, doSingleZoom]);
 
 	// Only render after loaded, but always call all hooks
 	const isLoading = !loaded || view === undefined || citySize === undefined || unitIndex === undefined || minimapMaxSize === undefined;
@@ -600,10 +581,6 @@ function MainPage() {
 								clampOffset={clampOffset}
 							/>
 							<ControlPanel
-								buildMode={buildMode}
-								onToggleBuildMode={handleToggleBuildMode}
-								activeBuildMode={activeBuildMode}
-								onSetBuildMode={handleSetBuildMode}
 							/>
 						</div>
 					</div>
