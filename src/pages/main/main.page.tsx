@@ -245,9 +245,6 @@ function MainPage() {
 			setView(v => ({ ...v, zoom: newZoom, offsetX: clamped.offsetX, offsetY: clamped.offsetY }))
 		}
 
-		let lastX = 0
-		let lastY = 0
-
 		const handleMouseDown = (e: MouseEvent) => {
 			if (e.button !== 1) return // Only pan with middle mouse button
 			isDraggingRef.current = true
